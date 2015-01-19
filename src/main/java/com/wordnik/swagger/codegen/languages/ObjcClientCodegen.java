@@ -1,4 +1,4 @@
-package com.wordnik.swagger.codegen.languages;
+  package com.wordnik.swagger.codegen.languages;
 
 import com.wordnik.swagger.util.Json;
 import com.wordnik.swagger.codegen.*;

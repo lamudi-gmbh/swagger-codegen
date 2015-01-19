@@ -30,6 +30,7 @@ cd $APP_DIR
 ./bin/flash-petstore.sh
 ./bin/java-petstore.sh
 ./bin/objc-petstore.sh
+./bin/swift-petstore.sh
 ./bin/php-petstore.sh
 ./bin/python-petstore.sh
 ./bin/python3-petstore.sh

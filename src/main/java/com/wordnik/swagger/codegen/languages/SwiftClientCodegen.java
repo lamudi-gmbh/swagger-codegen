@@ -13,19 +13,19 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
   protected static String PREFIX = "SWG";
 
   public String getName() {
-    return "objc";
+    return "swift";
   }
 
   public String getHelp() {
-    return "Generates an Objective-C client library.";
+    return "Generates a swift client library.";
   }
 
   public SwiftClientCodegen() {
     super();
-    outputFolder = "generated-code/objc";
+    outputFolder = "generated-code/swift";
     modelTemplateFiles.put("model.mustache", ".swift");
     apiTemplateFiles.put("api.mustache", ".swift");
-    templateDir = "objc";
+    templateDir = "swift";
     modelPackage = "";
 
     defaultIncludes = new HashSet<String>(

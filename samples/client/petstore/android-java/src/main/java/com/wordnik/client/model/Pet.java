@@ -1,8 +1,8 @@
 package com.wordnik.client.model;
 
 import com.wordnik.client.model.Category;
-import com.wordnik.client.model.Tag;
 import java.util.*;
+import com.wordnik.client.model.Tag;
 
 import com.wordnik.swagger.annotations.*;
 

@@ -20,7 +20,7 @@ fi
 cd $APP_DIR
 
 # if you've executed sbt assembly previously it will use that instead.
-export JAVA_OPTS="${JAVA_OPTS} -XX:MaxPermSize=256M -Xmx1024M -DloggerPath=conf/log4j.properties"
-ags="$@ com.wordnik.swagger.codegen.Codegen -i ~/Desktop/ss.json -l swift -o ~/Desktop/output -t src/main/resources/swift"
+export JAVA_OPTS="${JAVA_OPTS} -XX:MaxPermSize=p256M -Xmx1024M -DloggerPath=conf/log4j.properties"
+ags="$@ com.wordnik.swagger.codegen.Codegen -d -i /Users/mehdiesfahani/Desktop/ss.json -l swift -o ~/Desktop/output -t src/main/resources/swift"
 
 java -cp $APP_DIR/target/*:$APP_DIR/target/lib/* $ags
