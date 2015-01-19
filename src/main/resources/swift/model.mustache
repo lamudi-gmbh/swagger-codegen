@@ -13,7 +13,8 @@ class {{classname}}: BaseModel, Deserializable {
         {{#isPrimitiveType}}
         {{name}} <<< data["{{name}}"]
         {{/isPrimitiveType}}
-
+        {{#complexType}}
+        {{/complexType}}
         {{/vars}}
         title <<< data["title"]
         price <<< data["price"]
