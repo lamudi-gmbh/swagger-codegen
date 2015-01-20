@@ -5,26 +5,23 @@ import Foundation
 {{#model}}
 class {{classname}}: BaseModel, Deserializable {
 {{#vars}}
-    var {{name}}:{{type}}? {{#description}}/*{{{description}}} {{#isNotRequired}}[optional]{{/isNotRequired}}*/{{/description}}{{newline}}
-{{/vars}}
+
+
+complexType: {{complexType}}
+datatype: {{datatype}}
+containerType: {{containerType}}
+baseType: {{baseType}}
+    var {{name}}:{{#isContainer}}[{{complexType}}]{{/isContainer}}{{#isNotContainer}}{{datatype}}{{/isNotContainer}}?{{#description}}/*{{{description}}} {{#isNotRequired}}[optional]{{/isNotRequired}}*/{{/description}}{{/vars}}
 {{newline}}
     required init(data: [String : AnyObject]) {
         {{#vars}}
         {{#isPrimitiveType}}
-        {{name}} <<< data["{{name}}"]
+        {{name}} <<<{{#isContainer}}*{{/isContainer}} data["{{name}}"]
         {{/isPrimitiveType}}
         {{#complexType}}
+        {{name}} <<<<{{#isContainer}}*{{/isContainer}} data["{{name}}"]
         {{/complexType}}
         {{/vars}}
-        title <<< data["title"]
-        price <<< data["price"]
-        location <<<< data["location"]
-        geolocation <<<< data["geolocation"]
-        url <<< data["url"]
-        thumbnailUrl <<< data["thumbnail_url"]
-        attributes <<<<* data["attributes"]
-        activatedAt <<< data["activated_at"]
-        
     }
 }
 {{/model}}

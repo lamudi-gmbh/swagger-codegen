@@ -10,7 +10,6 @@ import java.io.File;
 public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig {
   protected Set<String> foundationClasses = new HashSet<String>();
   protected String sourceFolder = "client";
-  protected static String PREFIX = "SWG";
 
   public String getName() {
     return "swift";
@@ -54,7 +53,16 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
     typeMapping.put("array", "Array");
     typeMapping.put("List", "Array");
     typeMapping.put("object", "NSObject");
-
+    languageSpecificPrimitives = new HashSet<String>(
+      Arrays.asList(
+        "Int",
+        "String",
+        "Object",
+        "Boolean",
+        "Array",
+        "Date",
+        "Float")
+      );
     instantiationTypes.put("array", "Array");
     instantiationTypes.put("map", "Dictionary");
 
@@ -103,7 +111,7 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
       return Character.toUpperCase(type.charAt(0)) + type.substring(1);
     }
     else {
-      return PREFIX + Character.toUpperCase(type.charAt(0)) + type.substring(1);
+      return Character.toUpperCase(type.charAt(0)) + type.substring(1);
     }
   }
 
@@ -132,16 +140,16 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
 
   @Override
   public String toModelFilename(String name) {
-    return PREFIX + initialCaps(name);
+    return initialCaps(name);
   }
 
   @Override
   public String toApiName(String name) {
-    return PREFIX + initialCaps(name) + "Api";
+    return initialCaps(name) + "Request";
   }
 
   public String toApiFilename(String name) {
-    return PREFIX + initialCaps(name) + "Api";
+    return initialCaps(name) + "Request";
   }
 
   @Override
