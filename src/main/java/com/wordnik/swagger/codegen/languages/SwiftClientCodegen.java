@@ -100,7 +100,21 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
       type = swaggerType;
     return toModelName(type);
   }
+  @Override
+  public String getTypeDeclaration(Property p) {
+    if(p instanceof ArrayProperty) {
+      ArrayProperty ap = (ArrayProperty) p;
+      Property inner = ap.getItems();
+      return "[" + getTypeDeclaration(inner) + "]";
+    }
+    else if (p instanceof MapProperty) {
+      MapProperty mp = (MapProperty) p;
+      Property inner = mp.getAdditionalProperties();
 
+      return "[String, " + getTypeDeclaration(inner) + "]";
+    }
+    return super.getTypeDeclaration(p);
+  }
   @Override
   public String toModelName(String type) {
     if(typeMapping.keySet().contains(type) ||
@@ -111,7 +125,7 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
       return Character.toUpperCase(type.charAt(0)) + type.substring(1);
     }
     else {
-      return Character.toUpperCase(type.charAt(0)) + type.substring(1);
+      return Character.toUpperCase(type.charAt(0)) + type.substring(1) + "Model";
     }
   }
 
