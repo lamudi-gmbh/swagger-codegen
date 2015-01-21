@@ -10,8 +10,23 @@ class {{classname}}: BaseModel, Deserializable {
 
     required init(data: [String : AnyObject]) { 
     {{#vars}}
-        {{name}} <<<{{#complexType}}<{{/complexType}}{{#isContainer}}*{{/isContainer}} data["{{name}}"]{{/vars}} 
+        {{name}} <<<{{#complexType}}<{{/complexType}}{{#isContainer}}*{{/isContainer}} data["{{baseName}}"]{{/vars}} 
+
+    }
+
+    override func isValidObject() -> (Bool, String?) {
+        var failedProps:[String] = []
+        {{#vars}}{{#required}}
+        if {{name}} == nil {
+            failedProps += "{{name}}"
+        }
+        {{/required}}{{/vars}}
+        if count(failedProps) > 0 {
+            let failedPropsString = ", ".join(failedProps)
+            return (false, "Agent object without (\(failedPropsString)) is not valid. Mapping failed.")
+        }
         
+        return (true, nil)
     }
 }
 {{/model}}
