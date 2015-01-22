@@ -30,6 +30,7 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
     apiPackage = "com.wordnik.client.api";
     modelPackage = "com.wordnik.client.model";
 
+
     reservedWords = new HashSet<String> (
       Arrays.asList(
         "abstract", "continue", "for", "new", "switch", "assert", 
@@ -67,6 +68,45 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
       );
     instantiationTypes.put("array", "ArrayList");
     instantiationTypes.put("map", "HashMap");
+  }
+  
+  @Override
+  public String toVarName(String name) {
+     if(reservedWords.contains(name))
+       return "m"+toCamelCase(escapeReservedWord(name));
+     else
+       return "m"+toCamelCase(name);
+  }
+  
+  public String toCamelCase(String s){
+     String[] parts = s.split("_");
+     String camelCaseString = "";
+     for (String part : parts){
+       camelCaseString = camelCaseString + initialCaps(part);
+     }
+     return camelCaseString;
+  }
+  
+  public String initialLower(String s) {
+     return Character.toLowerCase(s.charAt(0)) + s.substring(1);
+  }
+  
+  public String addIs(String s) {
+	  if (s.substring(0, 2).equals("is")) {
+		  return s;
+	  } 
+	  return "is"+s;
+  }
+  
+  @Override 
+  public CodegenProperty fromProperty(String name, Property p) {
+    CodegenProperty property = super.fromProperty(name, p);
+    if(property.baseType.equalsIgnoreCase("Boolean")) {
+      property.getter = initialLower(toCamelCase(addIs(name)));  	
+    } else {
+      property.getter = "get" + toCamelCase(name);    	
+    }
+    return property;  
   }
 
   @Override
