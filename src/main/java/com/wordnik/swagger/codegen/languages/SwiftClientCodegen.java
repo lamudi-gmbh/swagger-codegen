@@ -67,6 +67,7 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
     instantiationTypes.put("map", "Dictionary");
 
     supportingFiles.add(new SupportingFile("BaseModel.swift", sourceFolder, "BaseModel.swift"));
+    supportingFiles.add(new SupportingFile("ErrorModel.swift", sourceFolder, "ErrorModel.swift"));
     supportingFiles.add(new SupportingFile("BaseRequest.swift", sourceFolder, "BaseRequest.swift"));
     supportingFiles.add(new SupportingFile("JSONHelper.swift", sourceFolder, "JSONHelper.swift"));
   }
@@ -149,12 +150,12 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
 
   @Override
   public String modelFileFolder() {
-    return outputFolder + File.separator + sourceFolder;
+    return outputFolder + File.separator + sourceFolder + File.separator + "model";
   }
 
   @Override
   public String toModelFilename(String name) {
-    return initialCaps(name);
+    return initialCaps(name) + "Model";
   }
 
   @Override
