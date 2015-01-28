@@ -33,12 +33,12 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
 
     reservedWords = new HashSet<String> (
       Arrays.asList(
-        "abstract", "continue", "for", "new", "switch", "assert", 
-        "default", "if", "package", "synchronized", "boolean", "do", "goto", "private", 
-        "this", "break", "double", "implements", "protected", "throw", "byte", "else", 
-        "import", "public", "throws", "case", "enum", "instanceof", "return", "transient", 
-        "catch", "extends", "int", "short", "try", "char", "final", "interface", "static", 
-        "void", "class", "finally", "long", "strictfp", "volatile", "const", "float", 
+        "abstract", "continue", "for", "new", "switch", "assert",
+        "default", "if", "package", "synchronized", "boolean", "do", "goto", "private",
+        "this", "break", "double", "implements", "protected", "throw", "byte", "else",
+        "import", "public", "throws", "case", "enum", "instanceof", "return", "transient",
+        "catch", "extends", "int", "short", "try", "char", "final", "interface", "static",
+        "void", "class", "finally", "long", "strictfp", "volatile", "const", "float",
         "native", "super", "while")
     );
 
@@ -48,11 +48,11 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
     additionalProperties.put("artifactVersion", artifactVersion);
 
     supportingFiles.add(new SupportingFile("pom.mustache", "", "pom.xml"));
-    supportingFiles.add(new SupportingFile("apiInvoker.mustache", 
+    supportingFiles.add(new SupportingFile("apiInvoker.mustache",
       (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator), "ApiInvoker.java"));
-    supportingFiles.add(new SupportingFile("JsonUtil.mustache", 
+    supportingFiles.add(new SupportingFile("JsonUtil.mustache",
       (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator), "JsonUtil.java"));
-    supportingFiles.add(new SupportingFile("apiException.mustache", 
+    supportingFiles.add(new SupportingFile("apiException.mustache",
       (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator), "ApiException.java"));
 
     languageSpecificPrimitives = new HashSet<String>(
@@ -69,7 +69,7 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
     instantiationTypes.put("array", "ArrayList");
     instantiationTypes.put("map", "HashMap");
   }
-  
+
   @Override
   public String toVarName(String name) {
      if(reservedWords.contains(name))
@@ -77,7 +77,7 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
      else
        return "m"+toCamelCase(name);
   }
-  
+
   public String toCamelCase(String s){
      String[] parts = s.split("_");
      String camelCaseString = "";
@@ -86,27 +86,27 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
      }
      return camelCaseString;
   }
-  
+
   public String initialLower(String s) {
      return Character.toLowerCase(s.charAt(0)) + s.substring(1);
   }
-  
+
   public String addIs(String s) {
 	  if (s.substring(0, 2).equals("is")) {
 		  return s;
-	  } 
+	  }
 	  return "is"+s;
   }
-  
-  @Override 
+
+  @Override
   public CodegenProperty fromProperty(String name, Property p) {
     CodegenProperty property = super.fromProperty(name, p);
     if(property.baseType.equalsIgnoreCase("Boolean")) {
-      property.getter = initialLower(toCamelCase(addIs(name)));  	
+      property.getter = initialLower(toCamelCase(addIs(name)));
     } else {
-      property.getter = "get" + toCamelCase(name);    	
+      property.getter = "get" + toCamelCase(name);
     }
-    return property;  
+    return property;
   }
 
   @Override
@@ -151,5 +151,10 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
     else
       type = swaggerType;
     return toModelName(type);
+  }
+
+  @Override
+  public String toModelFilename(String name) {
+    return name+"DTO";
   }
 }
