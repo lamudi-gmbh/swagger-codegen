@@ -28,10 +28,10 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
     modelPackage = "";
 
     defaultIncludes = new HashSet<String>(
-      Arrays.asList("Boolean", "Int", "String", "Array"));
+      Arrays.asList("Boolean", "Int", "String", "Array", "Float"));
 
     reservedWords = new HashSet<String>(
-      Arrays.asList("class", "break", "as", "associativity", "deinit", "case", "dynamicType", "convenience", "enum", "continue", 
+      Arrays.asList("class", "break", "as", "associativity", "deinit", "case", "dynamicType", "convenience", "enum", "continue", "description",
         "false", "dynamic", "extension", "default", "is", "didSet", "func", "do", "nil", "final", "import", "else", "self", 
         "get", "init", "fallthrough", "Self", "infix", "internal", "for", "super", "inout", "let", "if", "true", "lazy", "operator", 
         "in", "COLUMN", "left", "private", "return", "FILE", "mutating", "protocol", "switch", "FUNCTION", "none", "public", "where", 
@@ -42,7 +42,7 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
     typeMapping.put("enum", "String");
     typeMapping.put("date", "Date");
     typeMapping.put("Date", "Date");
-    typeMapping.put("boolean", "Boolean");
+    typeMapping.put("boolean", "Bool");
     typeMapping.put("string", "String");
     typeMapping.put("integer", "Int");
     typeMapping.put("int", "Int");
@@ -58,7 +58,7 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
         "Int",
         "String",
         "Object",
-        "Boolean",
+        "Bool",
         "Array",
         "Date",
         "Float")
@@ -145,7 +145,7 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
 
   @Override
   public String apiFileFolder() {
-    return outputFolder + File.separator + sourceFolder;
+    return outputFolder + File.separator + sourceFolder + File.separator + "request";
   }
 
   @Override
@@ -170,7 +170,7 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
   @Override
   public String toVarName(String name) {
     String paramName = name.replaceAll("[^a-zA-Z0-9_]","");
-    return paramName;
+    return super.toVarName(paramName);
   }
 
   public String escapeReservedWord(String name) {
