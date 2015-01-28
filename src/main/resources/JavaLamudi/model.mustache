@@ -1,23 +1,29 @@
 package com.lamudi.networking.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lamudi.networking.api.APIConstants;
 
 import java.util.ArrayList;
 import java.util.List;
 {{#models}}
-{{#model}}{{#description}}
+{{#model}}
+{{#description}}
 /**
  * {{description}}
- **/{{/description}}
-public class {{classname}} extends BaseDTO { {{#vars}}
-    @JsonProperty("{{baseName}}")
-    private {{#isContainer}}{{{datatype}}}{{/isContainer}}{{#isNotContainer}}{{{baseType}}}{{/isNotContainer}} {{name}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+ **/
+{{/description}}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class {{classname}} extends BaseDTO {
+    {{#vars}}
+    @JsonProperty(value = "{{baseName}}"{{#required}}, required = true{{/required}})
+    private {{#isContainer}}{{{datatype}}}{{/isContainer}}{{#isNotContainer}}{{{baseType}}}{{/isNotContainer}} {{name}}{{#isContainer}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/isContainer}};
     {{/vars}}
     {{#vars}}
-    public {{baseType}} {{getter}}() {
+    public {{#isContainer}}{{{datatype}}}{{/isContainer}}{{#isNotContainer}}{{{baseType}}}{{/isNotContainer}} {{getter}}() {
         return {{name}};
-    }{{/vars}}
+    }
+    {{/vars}}
 }
 {{/model}}
 {{/models}}
