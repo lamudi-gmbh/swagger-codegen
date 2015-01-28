@@ -14,7 +14,7 @@ import java.util.List;
 {{/description}}
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class {{classname}}DTO extends BaseDTO {
+public class {{classname}} extends BaseDTO {
     {{#vars}}
     @JsonProperty(value = "{{baseName}}"{{#required}}, required = true{{/required}})
     private {{#isContainer}}{{{datatype}}}{{/isContainer}}{{#isNotContainer}}{{{baseType}}}{{/isNotContainer}} {{name}}{{#isContainer}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/isContainer}};

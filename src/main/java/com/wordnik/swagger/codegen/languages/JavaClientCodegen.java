@@ -27,8 +27,8 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
     modelTemplateFiles.put("model.mustache", ".java");
     apiTemplateFiles.put("api.mustache", ".java");
     templateDir = "Java";
-    apiPackage = "com.wordnik.client.api";
-    modelPackage = "com.wordnik.client.model";
+    apiPackage = "com.lamudi.networking.api";
+    modelPackage = "com.lamudi.networking.api.dto";
 
 
     reservedWords = new HashSet<String> (
@@ -47,13 +47,13 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
     additionalProperties.put("artifactId", artifactId);
     additionalProperties.put("artifactVersion", artifactVersion);
 
-    supportingFiles.add(new SupportingFile("pom.mustache", "", "pom.xml"));
-    supportingFiles.add(new SupportingFile("apiInvoker.mustache",
-      (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator), "ApiInvoker.java"));
-    supportingFiles.add(new SupportingFile("JsonUtil.mustache",
-      (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator), "JsonUtil.java"));
-    supportingFiles.add(new SupportingFile("apiException.mustache",
-      (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator), "ApiException.java"));
+    // supportingFiles.add(new SupportingFile("pom.mustache", "", "pom.xml"));
+    // supportingFiles.add(new SupportingFile("apiInvoker.mustache",
+    //   (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator), "ApiInvoker.java"));
+    // supportingFiles.add(new SupportingFile("JsonUtil.mustache",
+    //   (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator), "JsonUtil.java"));
+    // supportingFiles.add(new SupportingFile("apiException.mustache",
+    //   (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator), "ApiException.java"));
 
     languageSpecificPrimitives = new HashSet<String>(
       Arrays.asList(
@@ -119,6 +119,7 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
     return outputFolder + "/" + sourceFolder + "/" + apiPackage().replaceAll("\\.", "/");
   }
 
+  @Override
   public String modelFileFolder() {
     return outputFolder + "/" + sourceFolder + "/" + modelPackage().replaceAll("\\.", "/");
   }
@@ -156,5 +157,24 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
   @Override
   public String toModelFilename(String name) {
     return name+"DTO";
+  }
+
+  @Override
+  public String toModelName(String name) {
+
+    if(typeMapping.keySet().contains(name) ||
+    importMapping.values().contains(name) ||
+    defaultIncludes.contains(name) ||
+    languageSpecificPrimitives.contains(name)) {
+      return initialCaps(name);
+    }
+    else {
+      return initialCaps(name) + "DTO";
+    }
+
+  }
+
+  public String toPrimitiveTypeName(String name) {
+    return initialCaps(name);
   }
 }
