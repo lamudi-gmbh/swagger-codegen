@@ -1,11 +1,14 @@
+
 import Foundation
 
-{{newline}}
 {{#models}}
 {{#model}}
 class {{classname}}: BaseModel, Deserializable {
-{{#vars}}
-    var {{name}}:{{datatype}}?{{#description}}/*{{{description}}} {{#isNotRequired}}[optional]{{/isNotRequired}}*/{{/description}}
+{{#vars}}{{#description}}
+    /*
+     * {{{description}}}
+     */{{/description}}
+    var {{name}}:{{datatype}}?//{{#required}}req{{/required}}{{^required}}opt{{/required}}
 {{/vars}}
 
     required init(data: [String : AnyObject]) { 
@@ -18,10 +21,10 @@ class {{classname}}: BaseModel, Deserializable {
         var failedProps:[String] = []
         {{#vars}}{{#required}}
         if {{name}} == nil {
-            failedProps += "{{name}}"
+            failedProps.append("{{name}}")
         }
         {{/required}}{{/vars}}
-        if count(failedProps) > 0 {
+        if failedProps.count > 0 {
             let failedPropsString = ", ".join(failedProps)
             return (false, "Agent object without (\(failedPropsString)) is not valid. Mapping failed.")
         }
