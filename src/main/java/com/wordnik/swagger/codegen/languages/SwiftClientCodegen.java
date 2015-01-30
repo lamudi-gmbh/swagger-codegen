@@ -31,7 +31,7 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
       Arrays.asList("Boolean", "Int", "String", "Array", "Float"));
 
     reservedWords = new HashSet<String>(
-      Arrays.asList("class", "break", "as", "associativity", "deinit", "case", "dynamicType", "convenience", "enum", "continue", "description",
+      Arrays.asList("data", "class", "break", "as", "associativity", "deinit", "case", "dynamicType", "convenience", "enum", "continue", "description",
         "false", "dynamic", "extension", "default", "is", "didSet", "func", "do", "nil", "final", "import", "else", "self", 
         "get", "init", "fallthrough", "Self", "infix", "internal", "for", "super", "inout", "let", "if", "true", "lazy", "operator", 
         "in", "COLUMN", "left", "private", "return", "FILE", "mutating", "protocol", "switch", "FUNCTION", "none", "public", "where", 
@@ -112,7 +112,7 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
       MapProperty mp = (MapProperty) p;
       Property inner = mp.getAdditionalProperties();
 
-      return "[String, " + getTypeDeclaration(inner) + "]";
+      return "[String: " + getTypeDeclaration(inner) + "]";
     }
     return super.getTypeDeclaration(p);
   }

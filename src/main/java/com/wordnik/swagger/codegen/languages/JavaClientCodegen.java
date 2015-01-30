@@ -34,7 +34,7 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
     reservedWords = new HashSet<String> (
       Arrays.asList(
         "abstract", "continue", "for", "new", "switch", "assert",
-        "if", "package", "synchronized", "boolean", "do", "goto", "private",
+        "default", "if", "package", "synchronized", "boolean", "do", "goto", "private",
         "this", "break", "double", "implements", "protected", "throw", "byte", "else",
         "import", "public", "throws", "case", "enum", "instanceof", "return", "transient",
         "catch", "extends", "int", "short", "try", "char", "final", "interface", "static",
@@ -67,16 +67,15 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
         "Object")
       );
     instantiationTypes.put("array", "ArrayList");
-    instantiationTypes.put("hasmap", "HashMap");
-    instantiationTypes.put("map", "Map");
+    instantiationTypes.put("map", "HashMap");
   }
 
   @Override
   public String toVarName(String name) {
      if(reservedWords.contains(name))
-       return "m"+toCamelCase(escapeReservedWord(escapeChars(name)));
+       return "m"+toCamelCase(escapeReservedWord(name));
      else
-       return "m"+toCamelCase(escapeChars(name));
+       return "m"+toCamelCase(name);
   }
 
   public String toCamelCase(String s){
@@ -103,9 +102,9 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
   public CodegenProperty fromProperty(String name, Property p) {
     CodegenProperty property = super.fromProperty(name, p);
     if(property.baseType.equalsIgnoreCase("Boolean")) {
-      property.getter = initialLower(toCamelCase(addIs(escapeChars(name))));
+      property.getter = initialLower(toCamelCase(addIs(name)));
     } else {
-      property.getter = "get" + toCamelCase(escapeChars(name));
+      property.getter = "get" + toCamelCase(name);
     }
     return property;
   }
@@ -113,10 +112,6 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
   @Override
   public String escapeReservedWord(String name) {
     return "_" + name;
-  }
-
-  public String escapeChars(String name) {
-    return name.replace("-","").replace(".","").replace(":","");
   }
 
   @Override
@@ -166,16 +161,17 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
 
   @Override
   public String toModelName(String name) {
+
     if(typeMapping.keySet().contains(name) ||
     importMapping.values().contains(name) ||
     defaultIncludes.contains(name) ||
-    instantiationTypes.values().contains(name) ||
     languageSpecificPrimitives.contains(name)) {
       return initialCaps(name);
     }
     else {
       return initialCaps(name) + "DTO";
     }
+
   }
 
   public String toPrimitiveTypeName(String name) {

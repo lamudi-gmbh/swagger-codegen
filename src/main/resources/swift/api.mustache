@@ -1,8 +1,49 @@
 {{#operations}}
 //{{classname}}
 {{#operation}}
-class {{operationId}} : BaseRequest {
-let basePath = @"{{basePath}}";
+class {{operationId}}Request : BaseRequest {
+	{{#allParams}}let {{paramName}}:{{dataType}}{{^required}}?{{/required}}
+	{{/allParams}}
+    let successHandler: (({{returnType}})->())
+    
+    init({{#allParams}}var {{paramName}}:{{dataType}}{{^required}}?{{/required}},{{/allParams}} success: (({{returnType}})->()), failure: ((Error) -> ())?) {
+        {{#allParams}}self.{{paramName}} = {{paramName}}
+		{{/allParams}}
+        self.successHandler = success
+        super.init(failure: failure, method: "{{httpMethod}}")
+    }
+
+    override func path() -> String {
+    	var urlString = "{{basePath}}{{path}}"
+    	{{#hasParams}}{{#pathParams}}
+		urlString.stringByReplacingOccurrencesOfString("{\({{baseName}})}", withString: {{paramName}}){{/pathParams}}
+
+		var queryParameters = [String:String]()
+		{{#queryParams}}{{^required}}if {{paramName}} != nil {
+	        {{/required}}queryParameters["{{baseName}}"] = {{paramName}};{{^required}}
+	    }{{/required}}{{/queryParams}}
+        if queryParameters.count > 0 {
+            urlString += "?" + "&".join(Array(queryParameters.keys).map{"\($0)=\(queryParameters[$0])"})
+        }{{/hasParams}}
+
+        return urlString
+    }
+
+    {{#returnBaseType}}{{^returnTypeIsPrimitive}}
+    override func proccessResult(responseDictionary: [String : AnyObject]) -> (Bool, String?) {
+    	let response = {{returnBaseType}}(data:responseDictionary)
+    	let (successBool, failMessage) = response.isValidObject() 
+    	if successBool {
+        	dispatch_async(dispatch_get_main_queue(), { () -> Void in
+        		self.successHandler(response)
+            })
+            return (true, nil)
+        } else {
+        	return (false, failMessage)
+        }
+    }
+    {{/returnTypeIsPrimitive}}{{/returnBaseType}}
 }
+
 {{/operation}}
 {{/operations}}

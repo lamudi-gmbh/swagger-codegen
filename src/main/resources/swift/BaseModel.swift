@@ -8,11 +8,7 @@
 import Foundation
 
 class BaseModel: NSObject, Printable {
-    
-//    override var description : String {
-//        return dictionaryRepresentation()
-//    }
-    
+        
     func dictionaryRepresentation() -> Dictionary<String,AnyObject> {
         
         var selfClass = self.dynamicType

@@ -7,18 +7,6 @@
 
 import Foundation
 
-public enum Method: String {
-    case OPTIONS = "OPTIONS"
-    case GET = "GET"
-    case HEAD = "HEAD"
-    case POST = "POST"
-    case PUT = "PUT"
-    case PATCH = "PATCH"
-    case DELETE = "DELETE"
-    case TRACE = "TRACE"
-    case CONNECT = "CONNECT"
-}
-
 class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
     
     // helper variables
@@ -26,7 +14,7 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
     private var _finished = false
     private var _cancelled = false
     
-    private var baseURL: String = "http://www.mock.com"
+    private var baseURL: String
     
     var failureHander: ((Error)->())?
     
@@ -34,7 +22,8 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
     var receivedData: NSMutableData?
     var httpResponse: NSHTTPURLResponse?
     var port: NSPort?
-    var customUrl: String?
+    let method:String
+    var finalPath:String = ""
 
     override var executing: Bool {
         get {
@@ -77,8 +66,9 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
         return true
     }
     
-    init(failure: ((Error) -> ())? = nil) {
+    init(failure: ((Error) -> ())? = nil, method:String) {
         self.failureHander = failure
+        self.method = method
         super.init()
     }
     
@@ -108,39 +98,20 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
         
     }
     
-    // MARK: To be overriden
-    
-    var params: [String:String] {
-        get {
-            // Default no parameters
-            return Dictionary<String, String>()
-        }
-    }
-    
-    var path: String {
-        get {
-            networkLogger?.error("This property has to be overridden by sub class. Terminating")
-            fatalError("This property has to be overridden by sub class. Terminating")
-        }
-    }
-    
-    var method: Method {
-        get {
-            networkLogger?.error("This property has to overridden by sub class. Terminating")
-            fatalError("This property has to overridden by sub class. Terminating")
-        }
-    }
-    
-    
     func shouldAddToQueue(queue: NSOperationQueue) -> Bool {
         return true
     }
     
-    func proccessResult(responseDictionary: [String:AnyObject]) -> Bool {
+    func proccessResult(responseDictionary: [String:AnyObject]) -> (Bool, String?) {
         // As default do nothing
-        return true
+        return (true, nil)
     }
     
+    func path() -> String {
+        networkLogger?.error("This property has to be overridden by sub class. Terminating")
+        fatalError("This property has to be overridden by sub class. Terminating")
+    }
+
     // MARK: main
     
     override func main() {
@@ -150,33 +121,10 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
     
         self.executing = true
         
-        var urlString: NSString!
-        if self.customUrl != nil {
-            urlString = self.customUrl!
-        } else {
-            urlString = baseURL + self.path
-        }
-        
-        networkLogger?.info("Sending request to \(urlString) with params \(self.params)")
-        
-            
-        switch self.method {
-            case .GET:
-            if self.params.count > 0 {
-                urlString = urlString + "?"
-                for (key, value) in self.params {
-                    urlString = urlString + key + "=" + value
-                }
-            }
-            case .POST:
-            // TODO
-            networkLogger?.error("Not supported method POST")
-                
-            default:
-            networkLogger?.error("Not supported method http mehtod")
-            assert(false, "Not supported http mehtod")
-            
-        }
+        let urlString = self.path()
+        self.finalPath = urlString
+
+        networkLogger?.info("Sending request to \(urlString) with params")
         
         if let url = NSURL(string: urlString) {
             
@@ -212,7 +160,7 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
         self.cancelled = true
         
         self.finishOperation()
-        networkLogger?.info("Request to \(self.baseURL + self.path) has been cancelled")
+        networkLogger?.info("Request to \(self.finalPath) has been cancelled")
     }
     
     func runFail(error: Error) {
@@ -231,7 +179,7 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
     
     func connection(connection: NSURLConnection, didFailWithError error: NSError) {
         receivedData = nil
-        networkLogger?.error("Connection failed to \(baseURL + self.path)")
+        networkLogger?.error("Connection failed to \(self.finalPath)")
         self.runFail(ApplicationError(code: .ConnectionFail, errorDescription: "Connection failed"))
     }
     
@@ -249,14 +197,7 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
             return
         }
         
-        var url: NSString!
-        if self.customUrl != nil {
-            url = self.customUrl!
-        } else {
-            url = baseURL + self.path
-        }
-        
-        
+        var url = self.path()
         
         if httpResponse == nil {
             // no response
@@ -314,12 +255,13 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
                 if self.cancelled {
                     return
                 }
-                if self.proccessResult(resultDictionary) {
+                let (processSuccess, processFailureMessage) = self.proccessResult(resultDictionary)
+                if processSuccess {
                     self.finishOperation()
                     return
                 } else {
                     // Mapping to expected object did fail
-                    self.runFail(ServiceError(code: .ExpectedObjectMappingFail, errorDescription: "Mapping to expected object did fail", receivedUrl: url, response: responseString))
+                    self.runFail(ServiceError(code: .ExpectedObjectMappingFail, errorDescription: processFailureMessage, receivedUrl: url, response: responseString))
                 }
             } else {
                 // response is not dictionary
