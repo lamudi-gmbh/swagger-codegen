@@ -13,9 +13,7 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
     private var _executing = false
     private var _finished = false
     private var _cancelled = false
-    
-    private var baseURL: String
-    
+        
     var failureHander: ((Error)->())?
     
     var connection: NSURLConnection?
@@ -261,7 +259,7 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
                     return
                 } else {
                     // Mapping to expected object did fail
-                    self.runFail(ServiceError(code: .ExpectedObjectMappingFail, errorDescription: processFailureMessage, receivedUrl: url, response: responseString))
+                    self.runFail(ServiceError(code: .ExpectedObjectMappingFail, errorDescription: processFailureMessage!, receivedUrl: url, response: responseString))
                 }
             } else {
                 // response is not dictionary
