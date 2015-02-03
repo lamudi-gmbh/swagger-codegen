@@ -16,7 +16,7 @@ class {{operationId}}Request : BaseRequest {
     }
     
     {{#hasParams}}override func requestBody() -> String? {
-        var formParams = []
+        var formParams:[String] = []
         {{#formParams}}{{^isContainer}}{{^required}}if {{paramName}} != nil { 
             {{/required}}formParams.append("{{baseName}}=\({{paramName}})"{{^required}})
             }{{/required}}{{/isContainer}}

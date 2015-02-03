@@ -130,7 +130,7 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
         
         if let url = NSURL(string: urlString) {
             
-            let request = NSURLRequest(URL: url, cachePolicy: NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: 30)
+            let request = NSMutableURLRequest(URL: url, cachePolicy: NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: 30)
             if let postString = self.requestBody() {
                 request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
             }
