@@ -173,6 +173,12 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
     return super.toVarName(paramName);
   }
 
+  @Override
+  public String toParamName(String name) {
+    String paramName = name.replaceAll("[^a-zA-Z0-9_]","");
+    return super.toVarName(paramName);
+  }
+
   public String escapeReservedWord(String name) {
     return "_" + name;
   }

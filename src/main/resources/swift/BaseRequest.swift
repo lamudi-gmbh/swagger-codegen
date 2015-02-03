@@ -110,6 +110,10 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
         fatalError("This property has to be overridden by sub class. Terminating")
     }
 
+    func requestBody() -> String? {
+        return nil
+    }
+
     // MARK: main
     
     override func main() {
@@ -127,6 +131,9 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
         if let url = NSURL(string: urlString) {
             
             let request = NSURLRequest(URL: url, cachePolicy: NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: 30)
+            if let postString = self.requestBody() {
+                request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
+            }
             self.connection = NSURLConnection(request: request, delegate: self, startImmediately: false)
             port = NSPort()
             let runloop = NSRunLoop.currentRunLoop()

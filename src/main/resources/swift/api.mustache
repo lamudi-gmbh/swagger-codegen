@@ -1,3 +1,5 @@
+import Foundation
+
 {{#operations}}
 //{{classname}}
 {{#operation}}
@@ -6,17 +8,26 @@ class {{operationId}}Request : BaseRequest {
 	{{/allParams}}
     let successHandler: (({{returnType}})->())
     
-    init({{#allParams}}var {{paramName}}:{{dataType}}{{^required}}?{{/required}},{{/allParams}} success: (({{returnType}})->()), failure: ((Error) -> ())?) {
+    init({{#allParams}}{{paramName}}:{{dataType}}{{^required}}?{{/required}}, {{/allParams}} success: (({{returnType}})->()), failure: ((Error) -> ())?) {
         {{#allParams}}self.{{paramName}} = {{paramName}}
 		{{/allParams}}
         self.successHandler = success
         super.init(failure: failure, method: "{{httpMethod}}")
     }
+    
+    {{#hasParams}}override func requestBody() -> String? {
+        var formParams = []
+        {{#formParams}}{{^isContainer}}{{^required}}if {{paramName}} != nil { 
+            {{/required}}formParams.append("{{baseName}}=\({{paramName}})"{{^required}})
+            }{{/required}}{{/isContainer}}
+        {{/formParams}}
+        return formParams.count > 0 ? "&".join(formParams) : nil
+    }{{/hasParams}}
 
     override func path() -> String {
     	var urlString = "{{basePath}}{{path}}"
     	{{#hasParams}}{{#pathParams}}
-		urlString.stringByReplacingOccurrencesOfString("{\({{baseName}})}", withString: {{paramName}}){{/pathParams}}
+		urlString.stringByReplacingOccurrencesOfString("{" + "{{baseName}}" + "}", withString: "\({{paramName}})"){{/pathParams}}
 
 		var queryParameters = [String:String]()
 		{{#queryParams}}{{^required}}if {{paramName}} != nil {
@@ -28,6 +39,8 @@ class {{operationId}}Request : BaseRequest {
 
         return urlString
     }
+
+
 
     {{#returnBaseType}}{{^returnTypeIsPrimitive}}
     override func proccessResult(responseDictionary: [String : AnyObject]) -> (Bool, String?) {
