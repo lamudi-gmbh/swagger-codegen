@@ -72,7 +72,7 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
     
     
     func addToQueue() -> BaseRequest {
-        stApi.addRequestToQueue(self)
+        APIHandler.api.addRequestToQueue(self)
         
         return self
     }
@@ -170,7 +170,7 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
     
     func runFail(error: Error) {
         networkLogger?.info("Error on response handling: \(error.errorDescription)")
-        stErrorHandler.handle(error)
+        ErrorHandler.handler.handle(error)
         if let failHandler = self.failureHander {
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
                 failHandler(error)

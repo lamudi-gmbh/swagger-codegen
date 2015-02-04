@@ -6,9 +6,9 @@ import Foundation
 class {{operationId}}Request : BaseRequest {
 	{{#allParams}}let {{paramName}}:{{dataType}}{{^required}}?{{/required}}
 	{{/allParams}}
-    let successHandler: (({{returnType}})->())
+    let successHandler: (({{returnType}}, {{operationId}}Request)->())
     
-    init({{#allParams}}{{paramName}}:{{dataType}}{{^required}}?{{/required}}, {{/allParams}} success: (({{returnType}})->()), failure: ((Error) -> ())?) {
+    init({{#allParams}}{{paramName}}:{{dataType}}{{^required}}?{{/required}}, {{/allParams}} success: (({{returnType}}, {{operationId}}Request)->()), failure: ((Error) -> ())?) {
         {{#allParams}}self.{{paramName}} = {{paramName}}
 		{{/allParams}}
         self.successHandler = success
@@ -22,7 +22,7 @@ class {{operationId}}Request : BaseRequest {
             }{{/required}}{{/isContainer}}
         {{/formParams}}
         return formParams.count > 0 ? "&".join(formParams) : nil
-    }{{/hasParams}}
+    }
 
     override func path() -> String {
     	var urlString = "{{basePath}}{{path}}"

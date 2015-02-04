@@ -67,6 +67,8 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
     instantiationTypes.put("map", "Dictionary");
 
     supportingFiles.add(new SupportingFile("BaseModel.swift", sourceFolder, "BaseModel.swift"));
+    supportingFiles.add(new SupportingFile("ErrorHandler.swift", sourceFolder, "ErrorHandler.swift"));
+    supportingFiles.add(new SupportingFile("APIHandler.swift", sourceFolder, "APIHandler.swift"));
     supportingFiles.add(new SupportingFile("ErrorModel.swift", sourceFolder, "ErrorModel.swift"));
     supportingFiles.add(new SupportingFile("BaseRequest.swift", sourceFolder, "BaseRequest.swift"));
     supportingFiles.add(new SupportingFile("JSONHelper.swift", sourceFolder, "JSONHelper.swift"));
