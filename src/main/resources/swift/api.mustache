@@ -24,9 +24,9 @@ class {{operationId}}Request : BaseRequest {
         return formParams.count > 0 ? "&".join(formParams) : nil
     }
 
-    override func path() -> String {
-    	var urlString = "{{basePath}}{{path}}"
-    	{{#hasParams}}{{#pathParams}}
+    {{/hasParams}}override func path() -> String {
+    	{{#hasParams}}var urlString = "{{basePath}}{{path}}"
+    	{{#pathParams}}
 		urlString.stringByReplacingOccurrencesOfString("{" + "{{baseName}}" + "}", withString: "\({{paramName}})"){{/pathParams}}
 
 		var queryParameters = [String:String]()
@@ -35,20 +35,17 @@ class {{operationId}}Request : BaseRequest {
 	    }{{/required}}{{/queryParams}}
         if queryParameters.count > 0 {
             urlString += "?" + "&".join(Array(queryParameters.keys).map{"\($0)=\(queryParameters[$0])"})
-        }{{/hasParams}}
+        }
 
-        return urlString
+        return urlString{{/hasParams}}{{^hasParams}}return "{{basePath}}{{path}}"{{/hasParams}}
     }
 
-
-
-    {{#returnBaseType}}{{^returnTypeIsPrimitive}}
-    override func proccessResult(responseDictionary: [String : AnyObject]) -> (Bool, String?) {
+    {{#returnBaseType}}{{^returnTypeIsPrimitive}}override func proccessResult(responseDictionary: [String : AnyObject]) -> (Bool, String?) {
     	let response = {{returnBaseType}}(data:responseDictionary)
     	let (successBool, failMessage) = response.isValidObject() 
     	if successBool {
         	dispatch_async(dispatch_get_main_queue(), { () -> Void in
-        		self.successHandler(response)
+        		self.successHandler(response, self)
             })
             return (true, nil)
         } else {
