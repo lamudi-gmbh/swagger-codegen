@@ -249,8 +249,8 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
                     // We should get application error
                     let errorModel = ErrorModel(data: resultDictionary)
                     
-                    if let error = ApplicationError.validateAndCreate(errorModel) {
-                        self.runFail(error)
+                    if errorModel.isValidObject().0 {
+                        self.runFail(ApplicationError(errorModel: errorModel))
                     } else {
                         // Mapping to error object did fail
                         self.runFail(ServiceError(code: .ErrorMappingFail, errorDescription: "Mapping to error object did fail", receivedUrl: url, response: responseString))
