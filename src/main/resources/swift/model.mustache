@@ -24,35 +24,39 @@ class {{classname}}: BaseModel, Deserializable {
 
     override func isValidObject() -> (Bool, String?) {
         var failedProps:[String] = []
+        var failed = false
         {{#vars}}{{#required}}
         if {{#required}}__{{/required}}{{name}} == nil{{#complexType}}{{^isContainer}} || {{#required}}__{{/required}}{{name}}!.isValidObject().0 == false{{/isContainer}}{{/complexType}} {
+            failed = true
             failedProps.append("'{{baseName}}'")
         }{{#complexType}}{{#isContainer}} else { 
             for obj in {{#required}}__{{/required}}{{name}}! {
                 let (isValid, errMessage) = obj{{#isMap}}.1{{/isMap}}.isValidObject()
                 if !isValid {
+                    failed = true
                     failedProps.append("{{#isMap}}'{{baseName}}[\(obj.0)]'{{/isMap}}{{^isMap}}a member of '{{baseName}}'{{/isMap}}(\(errMessage))")
                     break;
                 }
             }
         } {{/isContainer}}{{/complexType}}
-        {{/required}}{{^required}}{{#complexType}}{{#isContainer}}
-        if {{#isMap}}var collection = {{name}}{{/isMap}}{{^isMap}}{{name}} != nil{{/isMap}} {
-            {{#isMap}}let keys = Array(collection.keys)
-            for key in keys {
-                if !collection[key]!.isValidObject().0 {
-                    collection.removeValueForKey(key)
+        {{/required}}{{^required}}{{#complexType}}
+        if !failed { {{#isContainer}}
+            if {{#isMap}}var collection = {{name}}{{/isMap}}{{^isMap}}{{name}} != nil{{/isMap}} {
+                {{#isMap}}let keys = Array(collection.keys)
+                for key in keys {
+                    if !collection[key]!.isValidObject().0 {
+                        collection.removeValueForKey(key)
+                    }
+                }{{/isMap}}{{^isMap}}{{name}} = {{name}}!.filter{$0.isValidObject().0} {{/isMap}}
+                if {{name}}!.count == 0 {
+                    {{name}} = nil
                 }
-            }{{/isMap}}{{^isMap}}{{name}} = {{name}}!.filter{$0.isValidObject().0} {{/isMap}}
-            if {{name}}!.count == 0 {
+            } {{/isContainer}}{{^isContainer}}
+            if {{name}} != nil && !{{name}}!.isValidObject().0 {
                 {{name}} = nil
             }
-        } {{/isContainer}}{{^isContainer}}
-        if {{name}} != nil && !{{name}}!.isValidObject().0 {
-            {{name}} = nil
-        }
-        {{/isContainer}}{{/complexType}}{{/required}}{{/vars}}
-        if failedProps.count > 0 {
+        {{/isContainer}}} {{/complexType}}{{/required}}{{/vars}}
+        if failed {
             let failedPropsString = ", ".join(failedProps)
             return (false, "{{classname}} object without (\(failedPropsString)) is not valid. Mapping failed.")
         }
