@@ -382,6 +382,7 @@ public class DefaultCodegen {
               for(String req : impl.getRequired()) {
                 if(key.equals(req))
                   cp.required = true;
+                  m.hasRequiredVars = true;
               }
             }
             if(cp.complexType != null && !defaultIncludes.contains(cp.complexType)) {

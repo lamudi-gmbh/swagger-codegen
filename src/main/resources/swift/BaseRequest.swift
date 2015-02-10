@@ -249,7 +249,7 @@ class BaseRequest: NSOperation, NSURLConnectionDataDelegate {
                     // We should get application error
                     let errorModel = ErrorModel(data: resultDictionary)
                     
-                    if errorModel.isValidObject().0 {
+                    if errorModel.sanitizeAndValidate().0 {
                         self.runFail(ApplicationError(errorModel: errorModel))
                     } else {
                         // Mapping to error object did fail

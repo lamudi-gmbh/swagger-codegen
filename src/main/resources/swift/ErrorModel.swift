@@ -21,7 +21,7 @@ class ErrorModel: BaseModel, Deserializable {
         }
     }
     
-    override func isValidObject() -> (Bool, String?) {
+    override func sanitizeAndValidate() -> (Bool, String?) {
         
         var failedProp: String?
         if errorDescription == nil {

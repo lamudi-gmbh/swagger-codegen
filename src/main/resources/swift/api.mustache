@@ -42,7 +42,7 @@ class {{operationId}}Request : BaseRequest {
 
     {{#returnBaseType}}{{^returnTypeIsPrimitive}}override func proccessResult(responseDictionary: [String : AnyObject]) -> (Bool, String?) {
     	let response = {{returnBaseType}}(data:responseDictionary)
-    	let (successBool, failMessage) = response.isValidObject() 
+    	let (successBool, failMessage) = response.sanitizeAndValidate() 
     	if successBool {
         	dispatch_async(dispatch_get_main_queue(), { () -> Void in
         		self.successHandler(response, self)

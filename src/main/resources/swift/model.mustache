@@ -22,16 +22,16 @@ class {{classname}}: BaseModel, Deserializable {
 
     }
 
-    override func isValidObject() -> (Bool, String?) {
+    override func sanitizeAndValidate() -> (Bool, String?) { {{#hasRequiredVars}}
         var failedProps:[String] = []
-        var failed = false
+        var failed = false{{/hasRequiredVars}}
         {{#vars}}{{#required}}
-        if {{#required}}__{{/required}}{{name}} == nil{{#complexType}}{{^isContainer}} || {{#required}}__{{/required}}{{name}}!.isValidObject().0 == false{{/isContainer}}{{/complexType}} {
+        if {{#required}}__{{/required}}{{name}} == nil{{#complexType}}{{^isContainer}} || {{#required}}__{{/required}}{{name}}!.sanitizeAndValidate().0 == false{{/isContainer}}{{/complexType}} {
             failed = true
             failedProps.append("'{{baseName}}'")
         }{{#complexType}}{{#isContainer}} else { 
             for obj in {{#required}}__{{/required}}{{name}}! {
-                let (isValid, errMessage) = obj{{#isMap}}.1{{/isMap}}.isValidObject()
+                let (isValid, errMessage) = obj{{#isMap}}.1{{/isMap}}.sanitizeAndValidate()
                 if !isValid {
                     failed = true
                     failedProps.append("{{#isMap}}'{{baseName}}[\(obj.0)]'{{/isMap}}{{^isMap}}a member of '{{baseName}}'{{/isMap}}(\(errMessage))")
@@ -40,26 +40,27 @@ class {{classname}}: BaseModel, Deserializable {
             }
         } {{/isContainer}}{{/complexType}}
         {{/required}}{{^required}}{{#complexType}}
-        if !failed { {{#isContainer}}
-            if {{#isMap}}var collection = {{name}}{{/isMap}}{{^isMap}}{{name}} != nil{{/isMap}} {
-                {{#isMap}}let keys = Array(collection.keys)
-                for key in keys {
-                    if !collection[key]!.isValidObject().0 {
-                        collection.removeValueForKey(key)
-                    }
-                }{{/isMap}}{{^isMap}}{{name}} = {{name}}!.filter{$0.isValidObject().0} {{/isMap}}
-                if {{name}}!.count == 0 {
-                    {{name}} = nil
-                }
-            } {{/isContainer}}{{^isContainer}}
-            if {{name}} != nil && !{{name}}!.isValidObject().0 {
-                {{name}} = nil
-            }
-        {{/isContainer}}} {{/complexType}}{{/required}}{{/vars}}
-        if failed {
+        {{#hasRequiredVars}}if !failed { {{/hasRequiredVars}}{{#isContainer}}
+{{#hasRequiredVars}}    {{/hasRequiredVars}}        if {{#isMap}}var collection = {{name}}{{/isMap}}{{^isMap}}{{name}} != nil{{/isMap}} {
+{{#hasRequiredVars}}    {{/hasRequiredVars}}            {{#isMap}}let keys = Array(collection.keys)
+{{#hasRequiredVars}}    {{/hasRequiredVars}}            for key in keys {
+{{#hasRequiredVars}}    {{/hasRequiredVars}}                if !collection[key]!.sanitizeAndValidate().0 {
+{{#hasRequiredVars}}    {{/hasRequiredVars}}                    collection.removeValueForKey(key)
+{{#hasRequiredVars}}    {{/hasRequiredVars}}                }
+{{#hasRequiredVars}}    {{/hasRequiredVars}}            }{{/isMap}}{{^isMap}}{{name}} = {{name}}!.filter{$0.sanitizeAndValidate().0} {{/isMap}}
+{{#hasRequiredVars}}    {{/hasRequiredVars}}            if {{name}}!.count == 0 {
+{{#hasRequiredVars}}    {{/hasRequiredVars}}                {{name}} = nil
+{{#hasRequiredVars}}    {{/hasRequiredVars}}            }
+{{#hasRequiredVars}}    {{/hasRequiredVars}}        } {{/isContainer}}{{^isContainer}}
+{{#hasRequiredVars}}    {{/hasRequiredVars}}        if {{name}} != nil && !{{name}}!.sanitizeAndValidate().0 {
+{{#hasRequiredVars}}    {{/hasRequiredVars}}            {{name}} = nil
+{{#hasRequiredVars}}    {{/hasRequiredVars}}        }
+        {{/isContainer}}{{#hasRequiredVars}}}{{/hasRequiredVars}} {{/complexType}}{{/required}}{{/vars}}
+        {{#hasRequiredVars}}if failed {
             let failedPropsString = ", ".join(failedProps)
             return (false, "{{classname}} object without (\(failedPropsString)) is not valid. Mapping failed.")
         }
+        {{/hasRequiredVars}}
         
         return (true, nil)
     }

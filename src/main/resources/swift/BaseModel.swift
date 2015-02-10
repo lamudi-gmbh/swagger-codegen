@@ -29,7 +29,7 @@ class BaseModel: NSObject, Printable {
      *
      */
     
-    func isValidObject() -> (Bool, String?) {
+    func sanitizeAndValidate() -> (Bool, String?) {
         // if object do not need validation
         // just return true
         return (true, nil)
