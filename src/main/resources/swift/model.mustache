@@ -8,25 +8,37 @@ class {{classname}}: BaseModel, Deserializable {
     /*
      * {{{description}}}
      */{{/description}}
-    var {{name}}:{{datatype}}?//{{#required}}req{{/required}}{{^required}}opt{{/required}}
+    {{#required}}private {{/required}}let {{#required}}__{{/required}}{{name}}:{{datatype}}?{{#required}}
+    var {{name}} : {{datatype}} {
+        get {
+            return __{{name}}!
+        }
+    }{{/required}}
 {{/vars}}
 
     required init(data: [String : AnyObject]) { 
     {{#vars}}
-        {{name}} <<<{{#complexType}}<{{/complexType}}{{#isContainer}}*{{/isContainer}} data["{{baseName}}"]{{/vars}} 
+        {{#required}}__{{/required}}{{name}} <<<{{#complexType}}<{{/complexType}}{{#isContainer}}*{{/isContainer}} data["{{baseName}}"]{{/vars}} 
 
     }
 
     override func isValidObject() -> (Bool, String?) {
         var failedProps:[String] = []
         {{#vars}}{{#required}}
-        if {{name}} == nil {
-            failedProps.append("{{baseName}}")
-        }
+        if {{#required}}__{{/required}}{{name}} == nil{{#complexType}}{{^isContainer}} || {{#required}}__{{/required}}{{name}}!.isValidObject().0 == false{{/isContainer}}{{/complexType}} {
+            failedProps.append("'{{baseName}}'")
+        }{{#complexType}}{{#isContainer}} else { 
+            for obj in {{#required}}__{{/required}}{{name}}! {
+                if obj{{#isMap}}.1{{/isMap}}.isValidObject().0 == false {
+                    failedProps.append("{{#isMap}}'{{baseName}}[\(obj.0)]'{{/isMap}}{{^isMap}}a member of '{{baseName}}'{{/isMap}}")
+                    break;
+                }
+            }
+        } {{/isContainer}}{{/complexType}}
         {{/required}}{{/vars}}
         if failedProps.count > 0 {
             let failedPropsString = ", ".join(failedProps)
-            return (false, "Agent object without (\(failedPropsString)) is not valid. Mapping failed.")
+            return (false, "{{classname}} object without (\(failedPropsString)) is not valid. Mapping failed.")
         }
         
         return (true, nil)

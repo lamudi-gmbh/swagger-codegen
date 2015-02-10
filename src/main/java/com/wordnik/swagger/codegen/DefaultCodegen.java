@@ -492,6 +492,7 @@ public class DefaultCodegen {
     }
     else if(p instanceof MapProperty) {
       property.isContainer = true;
+      property.isMap = true;
       property.containerType = "map";
       MapProperty ap = (MapProperty) p;
       CodegenProperty cp = fromProperty("inner", ap.getAdditionalProperties());
