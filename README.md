@@ -18,7 +18,7 @@ The Swagger Specification has undergone 3 revisions since initial creation in 20
 
 Swagger Codegen Version | Release Date | Swagger Spec compatability | Notes
 ----------------------- | ------------ | -------------------------- | -----
-2.1.0 (in development)  | n/a          | 1.0, 1.1, 1.2, 2.0           | [branch develop_2.0](https://github.com/swagger-api/swagger-codegen/tree/develop_2.0)
+2.1.3-M1-SNAPSHOT                | 2015-02-23   | 1.0, 1.1, 1.2, 2.0   | [tag v2.1.0-M1](https://github.com/swagger-api/swagger-codegen)
 2.0.17                  | 2014-08-22   | 1.1, 1.2      | [tag v2.0.17](https://github.com/swagger-api/swagger-codegen/tree/v2.0.17)
 1.0.4                   | 2012-04-12   | 1.0, 1.1      | [tag v1.0.4](https://github.com/swagger-api/swagger-codegen/tree/swagger-codegen_2.9.1-1.1)
 
@@ -37,7 +37,7 @@ mvn package
 ```
 
 ### To generate a sample client library
-You can build a client against Wordnik's [petstore](http://petstore.swagger.wordnik.com) API as follows:
+You can build a client against the swagger sample [petstore](http://petstore.swagger.io) API as follows:
 
 ```
 ./bin/java-petstore.sh
@@ -46,8 +46,8 @@ You can build a client against Wordnik's [petstore](http://petstore.swagger.word
 This will run the generator with this command:
 
 ```
-java -cp ./target/*:./target/lib/* com.wordnik.swagger.codegen.Codegen \
-  -i http://petstore.swagger.wordnik.com/v2/swagger.json \
+java -jar modules/swagger-codegen-distribution/target/swagger-codegen-distribution-2.1.0-M1.jar \
+  -i http://petstore.swagger.io/v2/swagger.json \
   -l java \
   -o samples/client/petstore/java
 ```
@@ -55,8 +55,18 @@ java -cp ./target/*:./target/lib/* com.wordnik.swagger.codegen.Codegen \
 With a number of options.  You can get the options with the -h flag:
 ```
 usage: Codegen
+ -a,--auth                 addes authorization headers when fetching the
+                           swagger definitions remotely. Pass in a
+                           URL-encoded string of name:header with a comma
+                           separating multiple values
+ -d,--debug-info           prints additional info for debugging
+ -h,--help                 shows this message
  -i,--input-spec <arg>     location of the swagger spec, as URL or file
- -l,--lang <arg>           client language to generate
+ -l,--lang <arg>           client language to generate.
+                           Available languages include:
+                           [android, java, jaxrs, nodejs, objc, scalatra,
+                           scala, dynamic-html, html, swagger, tizen, php,
+                           python]
  -o,--output <arg>         where to write the generated files
  -t,--template-dir <arg>   folder containing the template files
  ```
@@ -81,7 +91,7 @@ It's just as easy--just use the `-i` flag to point to either a server or file.
 ### Modifying the client library format
 Don't like the default swagger client syntax?  Want a different language supported?  No problem!  Swagger codegen processes mustache templates with the [jmustache](https://github.com/samskivert/jmustache) engine.  You can modify our templates or make your own.
 
-You can look at `src/main/resources/${your-language}` for examples.  To make your own templates, create your own files and use the `-t` flag to specify your tempalte folder.  It actually is that easy.
+You can look at `modules/swagger-codegen/src/main/resources/${your-language}` for examples.  To make your own templates, create your own files and use the `-t` flag to specify your tempalte folder.  It actually is that easy.
 
 ### Where is Javascript???
 See our [javascript library](http://github.com/swagger-api/swagger-js)--it's completely dynamic and doesn't require
@@ -94,12 +104,7 @@ If you don't want to call your server, you can save the swagger spec files into 
 to the code generator like this:
 
 ```
--i ./src/test/resources/petstore.json
-```
-
-Or for example:
-```
-./bin/java-petstore-filemap.sh
+-i ./modules/swagger-codegen/src/test/resources/2_0/petstore.json
 ```
 
 Great for creating libraries on your ci server, from the [Swagger Editor](http://editor.swagger.io)... or while coding on an airplane.
@@ -109,12 +114,20 @@ Great for creating libraries on your ci server, from the [Swagger Editor](http:/
 There are different aspects of customizing the code generator beyond just creating or modifying templates.  Each language has a supporting configuration file to handle different type mappings, etc:
 
 ```
-$ ls -1 src/main/java/com/wordnik/swagger/codegen/languages/
+$ ls -1 modules/swagger-codegen/src/main/java/com/wordnik/swagger/codegen/languages/
 AndroidClientCodegen.java
 JavaClientCodegen.java
 JaxRSServerCodegen.java
+NodeJSServerCodegen.java
 ObjcClientCodegen.java
+PhpClientCodegen.java
+PythonClientCodegen.java
+ScalaClientCodegen.java
+ScalatraServerCodegen.java
 StaticDocCodegen.java
+StaticHtmlGenerator.java
+SwaggerGenerator.java
+TizenClientCodegen.java
 ```
 
 Each of these files creates reasonable defaults so you can get running quickly.  But if you want to configure package names, prefixes, model folders, etc., you may want to extend these.
@@ -145,14 +158,14 @@ Your subclass will now be loaded and overrides the `PREFIX` value in the supercl
 
 You have options.  The easiest is to use our [online validator](https://github.com/swagger-api/validator-badge) which not only will let you validate your spec, but with the debug flag, you can see what's wrong with your spec.  For example:
 
-http://online.swagger.io/validator/debug?url=http://petstore.swagger.wordnik.com/v2/swagger.json
+http://online.swagger.io/validator/debug?url=http://petstore.swagger.io/v2/swagger.json
 
 ### Generating dynamic html api documentation
 
 To do so, just use the `-l dynamic-html` flag when reading a spec file.  This creates HTML documentation that is available as a single-page application with AJAX.  To view the documentation:
 
 ```
-cd samples/swagger-dynamic-html/
+cd samples/dynamic-html/
 npm install
 node .
 ```
@@ -165,7 +178,7 @@ Which launches a node.js server so the AJAX calls have a place to go.
 To do so, just use the `-l html` flag when reading a spec file.  This creates a single, simple HTML file with embedded css so you can ship it as an email attachment, or load it from your filesystem:
 
 ```
-cd samples/swagger-html/
+cd samples/html/
 open index.html
 ```
 
@@ -176,8 +189,8 @@ You can also use the codegen to generate a server for a couple different framewo
 
 ### node.js
 ```
-java -cp ./target/*:./target/lib/* com.wordnik.swagger.codegen.Codegen \
-  -i http://petstore.swagger.wordnik.com/v2/swagger.json \
+java -jar modules/swagger-codegen-distribution/target/swagger-codegen-distribution-2.1.0-M1.jar \
+  -i http://petstore.swagger.io/v2/swagger.json \
   -l nodejs \
   -o samples/server/petstore/nodejs
 ```
@@ -188,8 +201,8 @@ java -cp ./target/*:./target/lib/* com.wordnik.swagger.codegen.Codegen \
 
 ### scala scalatra
 ```
-java -cp ./target/*:./target/lib/* com.wordnik.swagger.codegen.Codegen \
-  -i http://petstore.swagger.wordnik.com/v2/swagger.json \
+java -jar modules/swagger-codegen-distribution/target/swagger-codegen-distribution-2.1.0-M1.jar \
+  -i http://petstore.swagger.io/v2/swagger.json \
   -l scalatra \
   -o samples/server/petstore/scalatra
 ```
@@ -197,8 +210,8 @@ java -cp ./target/*:./target/lib/* com.wordnik.swagger.codegen.Codegen \
 ### java jax-rs
 
 ```
-java -cp ./target/*:./target/lib/* com.wordnik.swagger.codegen.Codegen \
-  -i http://petstore.swagger.wordnik.com/v2/swagger.json \
+java -jar modules/swagger-codegen-distribution/target/swagger-codegen-distribution-2.1.0-M1.jar \
+  -i http://petstore.swagger.io/v2/swagger.json \
   -l jaxrs \
   -o samples/server/petstore/jaxrs
 ```
