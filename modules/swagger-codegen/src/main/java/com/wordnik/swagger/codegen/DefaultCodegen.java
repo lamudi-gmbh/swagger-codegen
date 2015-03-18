@@ -279,6 +279,8 @@ public class DefaultCodegen {
    **/
   public String getSwaggerType(Property p) {
     String datatype = null;
+
+
     if(p instanceof StringProperty)
       datatype = "string";
     else if (p instanceof BooleanProperty)
@@ -290,7 +292,11 @@ public class DefaultCodegen {
     else if (p instanceof DoubleProperty)
       datatype = "double";
     else if (p instanceof FloatProperty)
+    {
       datatype = "float";
+      System.out.println("jhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjk");
+    }
+
     else if (p instanceof IntegerProperty)
       datatype = "integer";
     else if (p instanceof LongProperty)
