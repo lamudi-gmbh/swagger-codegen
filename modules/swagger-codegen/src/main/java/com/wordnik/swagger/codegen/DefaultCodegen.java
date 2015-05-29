@@ -62,6 +62,7 @@ public class DefaultCodegen {
       return output;
     }
     return input;
+
   }
 
   public Set<String> defaultIncludes() {
@@ -220,7 +221,7 @@ public class DefaultCodegen {
     importMapping.put("HashMap", "java.util.HashMap");
     importMapping.put("Array", "java.util.List");
     importMapping.put("ArrayList", "java.util.ArrayList");
-    importMapping.put("List", "java.util.*");
+    importMapping.put("List", "java.util.List");
     importMapping.put("Set", "java.util.*");
     importMapping.put("DateTime", "org.joda.time.*");
     importMapping.put("LocalDateTime", "org.joda.time.*");
@@ -292,11 +293,7 @@ public class DefaultCodegen {
     else if (p instanceof DoubleProperty)
       datatype = "double";
     else if (p instanceof FloatProperty)
-    {
       datatype = "float";
-      System.out.println("jhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjkjhre gkjerhsg ,jhse ,jhdfk jhsfdjk sdfhgjk sdfhgjk");
-    }
-
     else if (p instanceof IntegerProperty)
       datatype = "integer";
     else if (p instanceof LongProperty)
@@ -323,7 +320,7 @@ public class DefaultCodegen {
 
   public String initialCaps(String name) {
     if(name != null) {
-      if(name.length() > 2) {
+      if(name.length() >= 2) {
         return Character.toUpperCase(name.charAt(0)) + name.substring(1);
       } else {
         return name;

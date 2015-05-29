@@ -1,5 +1,6 @@
 package com.wordnik.swagger.codegen.languages;
 
+import com.wordnik.swagger.models.*;
 import com.wordnik.swagger.codegen.*;
 import com.wordnik.swagger.models.properties.*;
 
@@ -7,7 +8,9 @@ import java.util.*;
 import java.io.File;
 
 public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenConfig {
-  protected String invokerPackage = "io.swagger.client";
+  protected String requestPackage;
+  protected String responsePackage;
+  protected String servicePackage;
   protected String groupId = "io.swagger";
   protected String artifactId = "swagger-client";
   protected String artifactVersion = "1.0.0";
@@ -30,9 +33,13 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
     outputFolder = "generated-code/java";
     modelTemplateFiles.put("model.mustache", ".java");
     apiTemplateFiles.put("api.mustache", ".java");
+
     templateDir = "Java";
     apiPackage = "com.lamudi.networking.api";
-    modelPackage = "com.lamudi.networking.api.dto";
+    modelPackage = apiPackage + ".model";
+    requestPackage = apiPackage + ".request";
+    responsePackage = apiPackage + ".response";
+    servicePackage = apiPackage + ".service";
 
     reservedWords = new HashSet<String> (
       Arrays.asList(
@@ -45,18 +52,23 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
         "native", "super", "while")
     );
 
-    additionalProperties.put("invokerPackage", invokerPackage);
     additionalProperties.put("groupId", groupId);
     additionalProperties.put("artifactId", artifactId);
     additionalProperties.put("artifactVersion", artifactVersion);
 
-    // supportingFiles.add(new SupportingFile("pom.mustache", "", "pom.xml"));
-    // supportingFiles.add(new SupportingFile("apiInvoker.mustache",
-    //   (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator), "ApiInvoker.java"));
-    // supportingFiles.add(new SupportingFile("JsonUtil.mustache",
-    //   (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator), "JsonUtil.java"));
-    // supportingFiles.add(new SupportingFile("apiException.mustache",
-    //   (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator), "ApiException.java"));
+    String apiSourceFolder = (sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator);
+    String modelSourceFolder = (sourceFolder + File.separator + modelPackage).replace(".", java.io.File.separator);
+
+    supportingFiles.add(new SupportingFile("APIConstants.java", apiSourceFolder, "APIConstants.java"));
+    supportingFiles.add(new SupportingFile("CustomRequestInterceptor.java", apiSourceFolder, "CustomRequestInterceptor.java"));
+    supportingFiles.add(new SupportingFile("JacksonConverter.java", apiSourceFolder, "JacksonConverter.java"));
+    supportingFiles.add(new SupportingFile("PersistentDataManager.java", apiSourceFolder, "PersistentDataManager.java"));
+    supportingFiles.add(new SupportingFile("RequestManager.java", apiSourceFolder, "RequestManager.java"));
+    supportingFiles.add(new SupportingFile("ResponseCallback.java", apiSourceFolder, "ResponseCallback.java"));
+    supportingFiles.add(new SupportingFile("RestError.java", apiSourceFolder, "RestError.java"));
+    supportingFiles.add(new SupportingFile("BaseRequest.java", apiSourceFolder, "BaseRequest.java"));
+    supportingFiles.add(new SupportingFile("BaseDTO.java", modelSourceFolder, "BaseDTO.java"));
+    supportingFiles.add(new SupportingFile("BaseResponse.java", modelSourceFolder, "BaseResponse.java"));
 
     languageSpecificPrimitives = new HashSet<String>(
       Arrays.asList(
@@ -69,6 +81,7 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
         "Float",
         "Object")
       );
+
     instantiationTypes.put("array", "ArrayList");
     instantiationTypes.put("map", "HashMap");
   }
@@ -76,9 +89,13 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
   @Override
   public String toVarName(String name) {
      if(reservedWords.contains(name))
-       return "m"+toCamelCase(escapeReservedWord(name));
+       return "m"+escapeSpecialChars(toCamelCase(escapeReservedWord(name)));
      else
-       return "m"+toCamelCase(name);
+       return "m"+escapeSpecialChars(toCamelCase(name));
+  }
+
+  public String escapeSpecialChars(String name) {
+      return name.replaceAll("[^A-Za-z0-9]","");
   }
 
   public String toCamelCase(String s){
@@ -105,9 +122,9 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
   public CodegenProperty fromProperty(String name, Property p) {
     CodegenProperty property = super.fromProperty(name, p);
     if(property.baseType.equalsIgnoreCase("Boolean")) {
-      property.getter = initialLower(toCamelCase(addIs(name)));
+      property.getter = escapeSpecialChars(initialLower(toCamelCase(addIs(name))));
     } else {
-      property.getter = "get" + toCamelCase(name);
+      property.getter = "get" + escapeSpecialChars(toCamelCase(name));
     }
     return property;
   }
@@ -119,7 +136,7 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
 
   @Override
   public String apiFileFolder() {
-    return outputFolder + "/" + sourceFolder + "/" + apiPackage().replace('.', File.separatorChar);
+    return outputFolder + "/" + sourceFolder + "/" + servicePackage.replace('.', File.separatorChar);
   }
 
   @Override
@@ -159,25 +176,106 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
 
   @Override
   public String toModelFilename(String name) {
-    return name+"DTO";
+    return isResponse(name) ? name : name+"DTO";
   }
 
   @Override
   public String toModelName(String name) {
-
-    if(typeMapping.keySet().contains(name) ||
-    importMapping.values().contains(name) ||
-    defaultIncludes.contains(name) ||
-    languageSpecificPrimitives.contains(name)) {
+    if(typeMapping.keySet().contains(name) || importMapping.keySet().contains(name)
+    || defaultIncludes.contains(name) || languageSpecificPrimitives.contains(name)
+    || isResponse(name)) {
       return initialCaps(name);
-    }
-    else {
+    } else {
       return initialCaps(name) + "DTO";
     }
+  }
 
+  @Override
+  public CodegenModel fromModel(String name, Model model) {
+    CodegenModel m = super.fromModel(name, model);
+    if(isResponse(m.classname)) {
+      m.parent = "BaseResponse";
+    } else {
+      m.parent = "BaseDTO";
+    }
+
+    if(m.imports.contains("List")) {
+      m.imports.add("ArrayList");
+    }
+
+    if(m.imports.contains("Map")) {
+      m.imports.add("HashMap");
+    }
+    return m;
+  }
+
+  @Override
+  public Map<String, Object> postProcessOperations(Map<String, Object> objs) {
+    Map<String, Object> operations = (Map<String, Object>)objs.get("operations");
+    if(operations != null) {
+      List<CodegenOperation> ops = (List<CodegenOperation>) operations.get("operation");
+      for(CodegenOperation operation : ops) {
+        if (operation.hasConsumes == Boolean.TRUE) {
+          Map<String, String> firstType = operation.consumes.get(0);
+          if (firstType != null) {
+            if ("multipart/form-data".equals(firstType.get("mediaType"))) {
+              operation.isMultipart = Boolean.TRUE;
+            }
+          }
+        }
+        if(operation.returnType == null) {
+          operation.returnType = "Void";
+        }
+      }
+    }
+    return objs;
+  }
+
+  public boolean isResponse(String name) {
+    return name.toLowerCase().contains("response");
   }
 
   public String toPrimitiveTypeName(String name) {
     return initialCaps(name);
+  }
+
+  @Override
+  public String toApiName(String name) {
+    return initialCaps(name) + "Service";
+  }
+
+  public String toApiFilename(String name) {
+    return initialCaps(name) + "Service";
+  }
+
+  @Override
+  public String toParamName(String name) {
+    if(reservedWords.contains(name)) {
+      return escapeSpecialChars(escapeReservedWord(name));
+    }
+    return escapeSpecialChars(name);
+  }
+
+  @Override
+  public CodegenOperation fromOperation(String path, String httpMethod, Operation operation){
+    CodegenOperation op = super.fromOperation(path, httpMethod, operation);
+    if(operation.getVendorExtensions() != null && operation.getVendorExtensions().size() > 0) {
+      Iterator it = operation.getVendorExtensions().entrySet().iterator();
+      while (it.hasNext()) {
+        Map.Entry<String, Object> pair = (Map.Entry<String, Object>)it.next();
+        String key = pair.getKey();
+        String value = pair.getValue().toString();
+        if(key.equalsIgnoreCase("x-operationType")) {
+          op.operationType = value;
+        } else if(key.equalsIgnoreCase("x-requestName")) {
+          op.requestName = value;
+        } else if(key.equalsIgnoreCase("x-needsLogin")) {
+          op.needsLogin = Boolean.parseBoolean(value);
+        } else if(key.equalsIgnoreCase("x-baseUrl")) {
+          op.baseUrl = value;
+        }
+      }
+    }
+    return op;
   }
 }
