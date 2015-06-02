@@ -1,5 +1,6 @@
 package com.wordnik.swagger.codegen.languages;
 
+import com.wordnik.swagger.models.*;
 import com.wordnik.swagger.util.Json;
 import com.wordnik.swagger.codegen.*;
 import com.wordnik.swagger.models.properties.*;
@@ -71,6 +72,7 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
     instantiationTypes.put("map", "Dictionary");
 
     supportingFiles.add(new SupportingFile("BaseModel.swift", sourceFolder, "BaseModel.swift"));
+    supportingFiles.add(new SupportingFile("BaseResponseModel.swift", sourceFolder, "BaseResponseModel.swift"));
     supportingFiles.add(new SupportingFile("ErrorHandler.swift", sourceFolder, "ErrorHandler.swift"));
     supportingFiles.add(new SupportingFile("APIHandler.swift", sourceFolder, "APIHandler.swift"));
     supportingFiles.add(new SupportingFile("ErrorModel.swift", sourceFolder, "ErrorModel.swift"));
@@ -108,6 +110,22 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
       type = swaggerType;
     return toModelName(type);
   }
+
+  public boolean isResponse(String name) {
+    return name.toLowerCase().contains("response");
+  }
+
+  @Override
+  public CodegenModel fromModel(String name, Model model) {
+    CodegenModel m = super.fromModel(name, model);
+    if(isResponse(m.classname)) {
+      m.parent = "BaseResponseModel";
+    } else {
+      m.parent = "BaseModel";
+    }
+    return m;
+  }
+
   @Override
   public String getTypeDeclaration(Property p) {
     if(p instanceof ArrayProperty) {
