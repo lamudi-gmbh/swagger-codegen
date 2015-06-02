@@ -116,6 +116,28 @@ public class SwiftClientCodegen extends DefaultCodegen implements CodegenConfig 
   }
 
   @Override
+  public CodegenOperation fromOperation(String path, String httpMethod, Operation operation){
+    CodegenOperation op = super.fromOperation(path, httpMethod, operation);
+    op.requestName = initialCaps(op.operationId);
+    if(operation.getVendorExtensions() != null && operation.getVendorExtensions().size() > 0) {
+      Iterator it = operation.getVendorExtensions().entrySet().iterator();
+      while (it.hasNext()) {
+        Map.Entry<String, Object> pair = (Map.Entry<String, Object>)it.next();
+        String key = pair.getKey();
+        String value = pair.getValue().toString();
+        if(key.equalsIgnoreCase("x-operationType")) {
+          op.operationType = value;
+        } else if(key.equalsIgnoreCase("x-needsLogin")) {
+          op.needsLogin = Boolean.parseBoolean(value);
+        } else if(key.equalsIgnoreCase("x-baseUrl")) {
+          op.baseUrl = value;
+        }
+      }
+    }
+    return op;
+  }
+
+  @Override
   public CodegenModel fromModel(String name, Model model) {
     CodegenModel m = super.fromModel(name, model);
     if(isResponse(m.classname)) {
