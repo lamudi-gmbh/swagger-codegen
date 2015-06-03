@@ -259,6 +259,7 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
   @Override
   public CodegenOperation fromOperation(String path, String httpMethod, Operation operation){
     CodegenOperation op = super.fromOperation(path, httpMethod, operation);
+    op.requestName = initialCaps(op.operationId);
     if(operation.getVendorExtensions() != null && operation.getVendorExtensions().size() > 0) {
       Iterator it = operation.getVendorExtensions().entrySet().iterator();
       while (it.hasNext()) {
@@ -267,8 +268,6 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
         String value = pair.getValue().toString();
         if(key.equalsIgnoreCase("x-operationType")) {
           op.operationType = value;
-        } else if(key.equalsIgnoreCase("x-requestName")) {
-          op.requestName = value;
         } else if(key.equalsIgnoreCase("x-needsLogin")) {
           op.needsLogin = Boolean.parseBoolean(value);
         } else if(key.equalsIgnoreCase("x-baseUrl")) {
