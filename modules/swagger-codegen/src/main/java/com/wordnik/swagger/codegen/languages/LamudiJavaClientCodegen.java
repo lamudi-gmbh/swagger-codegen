@@ -121,11 +121,11 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
   @Override
   public CodegenProperty fromProperty(String name, Property p) {
     CodegenProperty property = super.fromProperty(name, p);
-    if(property.baseType.equalsIgnoreCase("Boolean")) {
-      property.getter = escapeSpecialChars(initialLower(toCamelCase(addIs(name))));
-    } else {
+    // if(property.baseType.equalsIgnoreCase("Boolean")) {
+    //   property.getter = escapeSpecialChars(initialLower(toCamelCase(addIs(name))));
+    // } else {
       property.getter = "get" + escapeSpecialChars(toCamelCase(name));
-    }
+    // }
     return property;
   }
 
