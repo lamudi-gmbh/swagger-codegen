@@ -60,7 +60,7 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
     String modelSourceFolder = (sourceFolder + File.separator + modelPackage).replace(".", java.io.File.separator);
 
     supportingFiles.add(new SupportingFile("APIConstants.java", apiSourceFolder, "APIConstants.java"));
-    supportingFiles.add(new SupportingFile("CustomRequestInterceptor.java", apiSourceFolder, "CustomRequestInterceptor.java"));
+    supportingFiles.add(new SupportingFile("OkHttpClientHelper.java", apiSourceFolder, "OkHttpClientHelper.java"));
     supportingFiles.add(new SupportingFile("JacksonConverter.java", apiSourceFolder, "JacksonConverter.java"));
     supportingFiles.add(new SupportingFile("PersistentDataManager.java", apiSourceFolder, "PersistentDataManager.java"));
     supportingFiles.add(new SupportingFile("RequestManager.java", apiSourceFolder, "RequestManager.java"));
