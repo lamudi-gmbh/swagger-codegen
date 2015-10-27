@@ -58,17 +58,26 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
 
     String apiSourceFolder = (sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator);
     String modelSourceFolder = (sourceFolder + File.separator + modelPackage).replace(".", java.io.File.separator);
+    String serviceSourceFolder = (sourceFolder + File.separator + servicePackage).replace(".", java.io.File.separator);
 
     supportingFiles.add(new SupportingFile("APIConstants.java", apiSourceFolder, "APIConstants.java"));
     supportingFiles.add(new SupportingFile("OkHttpClientHelper.java", apiSourceFolder, "OkHttpClientHelper.java"));
-    supportingFiles.add(new SupportingFile("JacksonConverter.java", apiSourceFolder, "JacksonConverter.java"));
+    supportingFiles.add(new SupportingFile("ConversionException.java", apiSourceFolder, "ConversionException.java"));
+    supportingFiles.add(new SupportingFile("JacksonConverterFactory.java", apiSourceFolder, "JacksonConverterFactory.java"));
+    supportingFiles.add(new SupportingFile("JacksonRequestBodyConverter.java", apiSourceFolder, "JacksonRequestBodyConverter.java"));
+    supportingFiles.add(new SupportingFile("JacksonResponseBodyConverter.java", apiSourceFolder, "JacksonResponseBodyConverter.java"));
     supportingFiles.add(new SupportingFile("PersistentDataManager.java", apiSourceFolder, "PersistentDataManager.java"));
     supportingFiles.add(new SupportingFile("RequestManager.java", apiSourceFolder, "RequestManager.java"));
     supportingFiles.add(new SupportingFile("ResponseCallback.java", apiSourceFolder, "ResponseCallback.java"));
     supportingFiles.add(new SupportingFile("RestError.java", apiSourceFolder, "RestError.java"));
     supportingFiles.add(new SupportingFile("BaseRequest.java", apiSourceFolder, "BaseRequest.java"));
+    supportingFiles.add(new SupportingFile("OkHttpClientHelper.java", apiSourceFolder, "OkHttpClientHelper.java"));
     supportingFiles.add(new SupportingFile("BaseDTO.java", modelSourceFolder, "BaseDTO.java"));
     supportingFiles.add(new SupportingFile("BaseResponse.java", modelSourceFolder, "BaseResponse.java"));
+    supportingFiles.add(new SupportingFile("SavedSearchesResponseTemp.java", modelSourceFolder, "SavedSearchesResponseTemp.java"));
+    supportingFiles.add(new SupportingFile("WorkaroundBaseResponse.java", modelSourceFolder, "WorkaroundBaseResponse.java"));
+    supportingFiles.add(new SupportingFile("WorkaroundMessagesDTO.java", modelSourceFolder, "WorkaroundMessagesDTO.java"));
+    supportingFiles.add(new SupportingFile("WorkAroundUserService.java", serviceSourceFolder, "WorkAroundUserService.java"));
 
     languageSpecificPrimitives = new HashSet<String>(
       Arrays.asList(
