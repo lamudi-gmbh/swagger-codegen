@@ -7,7 +7,7 @@ import java.util.*;
 public class CodegenOperation {
   public Boolean hasConsumes, hasProduces, hasParams, returnTypeIsPrimitive,
     returnSimpleType, subresourceOperation, isMapContainer, isListContainer,
-    hasMore = Boolean.TRUE, isMultipart, needsLogin = Boolean.FALSE, isAngi = Boolean.FALSE;
+    hasMore = Boolean.TRUE, isMultipart, needsLogin = Boolean.FALSE, isAngi = Boolean.FALSE, isRx = Boolean.FALSE;
   public String path, operationId, returnType, httpMethod, returnBaseType,
     returnContainer, summary, notes, baseName, defaultResponse, operationType,
     requestName, baseUrl, bundle;

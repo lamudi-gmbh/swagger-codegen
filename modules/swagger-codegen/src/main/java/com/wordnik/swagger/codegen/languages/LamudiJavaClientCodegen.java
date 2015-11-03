@@ -72,6 +72,8 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
         supportingFiles.add(new SupportingFile("RestError.java", apiSourceFolder, "RestError.java"));
         supportingFiles.add(new SupportingFile("BaseRequest.java", apiSourceFolder, "BaseRequest.java"));
         supportingFiles.add(new SupportingFile("OkHttpClientHelper.java", apiSourceFolder, "OkHttpClientHelper.java"));
+        supportingFiles.add(new SupportingFile("ResponseSubscriber.java", apiSourceFolder, "ResponseSubscriber.java"));
+        supportingFiles.add(new SupportingFile("Utils.java", apiSourceFolder, "Utils.java"));
         supportingFiles.add(new SupportingFile("BaseDTO.java", modelSourceFolder, "BaseDTO.java"));
         supportingFiles.add(new SupportingFile("BaseResponse.java", modelSourceFolder, "BaseResponse.java"));
         supportingFiles.add(new SupportingFile("SavedSearchesResponseTemp.java", modelSourceFolder, "SavedSearchesResponseTemp.java"));
@@ -281,6 +283,8 @@ public class LamudiJavaClientCodegen extends DefaultCodegen implements CodegenCo
                     op.isAngi = Boolean.parseBoolean(value);
                 } else if (key.equalsIgnoreCase("x-bundle")) {
                     op.bundle = value;
+                } else if (key.equalsIgnoreCase("x-isRx")) {
+                    op.isRx = Boolean.parseBoolean(value);
                 }
             }
         }
