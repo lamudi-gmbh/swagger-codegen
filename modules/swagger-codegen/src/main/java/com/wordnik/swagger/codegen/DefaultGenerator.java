@@ -55,7 +55,12 @@ public class DefaultGenerator implements Generator {
           if(license.getUrl() != null)
             config.additionalProperties().put("licenseUrl", license.getUrl());
         }
+        if (info.getVersion() != null) {
+          config.additionalProperties().put("apiVersion", info.getVersion());
+        }
       }
+
+
 
       StringBuilder hostBuilder = new StringBuilder();
       if(swagger.getSchemes() != null && swagger.getSchemes().size() > 0) {
